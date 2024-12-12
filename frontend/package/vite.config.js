@@ -16,7 +16,21 @@ export default defineConfig({
         loader: 'jsx',
         include: /src\/.*\.jsx?$/,
         exclude: [],
-    },
+    }, 
+    build: {
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              pdfjs: ['pdfjs-dist']
+            }
+          }
+        }
+      },
+      server: {
+        fs: {
+          allow: ['..'] // Allow file imports from parent directories
+        }
+      },
     optimizeDeps: {
         esbuildOptions: {
             plugins: [
