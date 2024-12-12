@@ -53,6 +53,7 @@ router.post('/', authenticateToken, async (req, res) => {
   const {
     section,
     question,
+    question_type,
     input_type,
     attempted_answer,
     correct_answer,
@@ -66,7 +67,7 @@ router.post('/', authenticateToken, async (req, res) => {
 
   console.log("Request Body:", req.body);
 
-  if (!section || !question || !correct_answer || !explanation) {
+  if (!section || !question || !question_type || !correct_answer || !explanation) {
     console.log("Required fields are missing");
     return res.status(400).json({ success: false, message: 'Required fields are missing' });
   }
@@ -91,6 +92,7 @@ router.post('/', authenticateToken, async (req, res) => {
     const newEntry = {
       section,
       question,
+      question_type,
       input_type: input_type || 'N/A',
       attempted_answer: input_type === 'Attempted Answer' ? attempted_answer || 'N/A' : 'N/A',
       correct_answer,

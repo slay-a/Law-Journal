@@ -62,7 +62,7 @@ router.get('/', authenticateToken, async (req, res) => {
 
     // Retrieve all law journal entries for the authenticated user
     const entries = await db('LawJournalEntries')
-      .select('id', 'section', 'question', 'input_type', 'attempted_answer', 'correct_answer', 'explanation', 'reason_for_mistake', 'choice_a', 'choice_b', 'choice_c', 'choice_d', 'created_at')
+      .select('id', 'section', 'question', 'input_type', 'attempted_answer', 'correct_answer', 'explanation', 'reason_for_mistake', 'choice_a', 'choice_b', 'choice_c', 'choice_d', 'created_at','question_type')
       .where({ user_id })
       .orderBy('created_at', 'desc');
 

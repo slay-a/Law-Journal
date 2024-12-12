@@ -39,6 +39,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
   const {
     section,
     question,
+    question_type,
     input_type,
     attempted_answer,
     correct_answer,
@@ -50,7 +51,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     choice_d
   } = req.body;
 
-  if (!section || !question || !correct_answer || !explanation) {
+  if (!section || !question ||!question_type || !correct_answer || !explanation) {
     return res.status(400).json({ success: false, message: 'Required fields are missing' });
   }
 
@@ -80,6 +81,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     const updatedEntry = {
       section,
       question,
+      question_type,
       input_type,
       attempted_answer: input_type === 'Attempted Answer' ? attempted_answer || 'N/A' : 'N/A',
       correct_answer,

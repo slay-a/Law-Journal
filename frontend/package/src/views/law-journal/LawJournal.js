@@ -10,6 +10,7 @@ const LawJournal = () => {
   const [newEntry, setNewEntry] = useState({
     section: '',
     question: '',
+    question_type:'',
     input_type: 'None',
     attempted_answer: '',
     correct_answer: '',
@@ -62,6 +63,7 @@ const LawJournal = () => {
         const requestData = {
           section: newEntry.section,
           question: newEntry.question,
+          question_type: newEntry.question_type,
           input_type: newEntry.input_type,
           attempted_answer: newEntry.input_type === 'Attempted Answer' ? newEntry.attempted_answer || 'N/A' : 'N/A',
           correct_answer: newEntry.correct_answer,
@@ -94,6 +96,7 @@ const LawJournal = () => {
             setNewEntry({
               section: '',
               question: '',
+              question_type:'',
               input_type: 'None',
               attempted_answer: '',
               correct_answer: '',
@@ -132,6 +135,7 @@ const LawJournal = () => {
     setNewEntry({
       section: entry.section,
       question: entry.question,
+      question_type: entry.question_type,
       input_type: entry.input_type,
       attempted_answer: entry.attempted_answer,
       correct_answer: entry.correct_answer,
@@ -149,6 +153,7 @@ const LawJournal = () => {
           const jwt_token = Cookies.get('jwt_token');
           const requestData = {
             section: entry.section,
+            question_type: entry.question_type,
             question: entry.question,
             input_type: entry.input_type,
             attempted_answer: entry.attempted_answer || 'N/A',
@@ -178,6 +183,7 @@ const LawJournal = () => {
         setNewEntry({
           section: '',
           question: '',
+          question_type: '',
           input_type: 'None',
           attempted_answer: '',
           correct_answer: '',
@@ -189,6 +195,46 @@ const LawJournal = () => {
         setEditEntryId(null);
       };
     
+      // Dynamically display question types based on section selection
+  const getQuestionTypes = () => {
+    switch (newEntry.section) {
+      case 'Logical Reasoning':
+        return [
+          'Assumption Questions', 
+          'Strengthen/Weaken Questions', 
+          'Flaw Questions', 
+          'Inference Questions', 
+          'Main Point Questions', 
+          'Parallel Reasoning Questions', 
+          'Method of Reasoning Questions', 
+          'Point at Issue Questions', 
+          'Paradox Questions', 
+          'Principle Questions'
+        ];
+      case 'Analytical Reasoning':
+        return [
+          'Sequencing Games', 
+          'Grouping Games', 
+          'Matching Games', 
+          'Hybrid Games', 
+          'Local Questions', 
+          'Global Questions'
+        ];
+      case 'Reading Comprehension':
+        return [
+          'Main Idea Questions', 
+          'Author’s Tone Questions', 
+          'Detail Questions', 
+          'Inference Questions', 
+          'Structure/Organization Questions', 
+          'Function Questions', 
+          'Analogy Questions', 
+          'Weaken/Strengthen Questions'
+        ];
+      default:
+        return [];
+    }
+  };
   return (
     <Grid container spacing={3} className="law-journal-container">
       <Grid item xs={12}>
@@ -198,10 +244,10 @@ const LawJournal = () => {
       <Grid item xs={12} md={6}>
         <Paper style={{ padding: 20 }}>
         <Typography variant="h6">{editMode ? 'Edit Test Entry' : 'Add a New Test Entry'}</Typography>
-        <Select 
-            fullWidth 
-            value={newEntry.section} 
-            onChange={(e) => handleInputChange(e)} 
+        <Select
+            fullWidth
+            value={newEntry.section}
+            onChange={(e) => handleInputChange(e)}
             name="section"
             style={{ marginBottom: '15px' }}
           >
@@ -210,6 +256,20 @@ const LawJournal = () => {
             <MenuItem value="Analytical Reasoning">Analytical Reasoning</MenuItem>
             <MenuItem value="Reading Comprehension">Reading Comprehension</MenuItem>
           </Select>
+
+          <Select
+            fullWidth
+            value={newEntry.question_type}
+            onChange={(e) => handleInputChange(e)}
+            name="question_type"
+            style={{ marginBottom: '15px' }}
+          >
+            <MenuItem value="">Select Question Type</MenuItem>
+            {getQuestionTypes().map((type, index) => (
+              <MenuItem key={index} value={type}>{type}</MenuItem>
+            ))}
+          </Select>
+
 
           <TextField 
             label="Question" 
@@ -333,8 +393,10 @@ const LawJournal = () => {
           {testEntries.filter(entry => !filterSection || entry.section === filterSection).map((entry, index) => (
             <Paper key={index} style={{ marginBottom: '15px', padding: '10px' }}>
               <Typography variant="body1"><strong>Section:</strong> {entry.section}</Typography>
+              <Typography variant="body1"><strong>Question Type:</strong> {entry.question_type}</Typography>
               <Typography variant="body1"><strong>Question:</strong> {entry.question}</Typography>
               <Typography variant="body1"><strong>Correct Answer:</strong> {entry.correct_answer}</Typography>
+              <Typography variant="body1"><strong>Attempted Answer:</strong> {entry.attempted_answer}</Typography>
               <Typography variant="body1"><strong>Explanation:</strong> {entry.explanation}</Typography>
               <IconButton color="primary" onClick={() => editEntry(entry)}>
                 <Edit />
