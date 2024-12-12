@@ -64,26 +64,52 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
-// Route to upload image
 router.post("/upload-image", authenticateToken, upload.single("image"), async (req, res) => {
-  try {
-    console.log("Image uploaded:", req.file);
-    const title = req.body.title;
-    const imageName = req.file.filename;
-    const db = router.locals.db; // Get Knex instance
-
-    await db('ImagesDetails').insert({
-      title: title,
-      image: imageName,
-      user_id: req.user_id
-    });
-
-    res.json({ status: "ok", message: "Image uploaded successfully" });
-  } catch (error) {
-    console.error("Error inserting image into database:", error);
-    res.status(500).json({ status: "error", message: "Failed to upload image" });
-  }
-});
+    try {
+      console.log("Image uploaded:", req.file);
+      const title = req.body.title || 'Profile Image';
+      const imageName = req.file.filename;
+      const db = router.locals.db; // Get Knex instance
+  
+      // 🔥 Check if the user already has an existing image
+      const existingImage = await db('ImagesDetails')
+        .select('image')
+        .where({ user_id: req.user_id })
+        .first();
+  
+      if (existingImage) {
+        // 🔥 Delete the existing image file from the filesystem
+        const existingImagePath = path.join(imagesPath, existingImage.image);
+        if (fs.existsSync(existingImagePath)) {
+          fs.unlinkSync(existingImagePath);
+          console.log(`Deleted existing image: ${existingImagePath}`);
+        }
+  
+        // 🔥 Delete the old image entry from the database
+        await db('ImagesDetails')
+          .where({ user_id: req.user_id })
+          .del();
+        console.log('Deleted existing image record from database');
+      }
+  
+      // 🔥 Insert new image into the database
+      await db('ImagesDetails').insert({
+        title: title,
+        image: imageName,
+        user_id: req.user_id
+      });
+  
+      res.json({ 
+        status: "ok", 
+        message: "Image uploaded successfully", 
+        data: { image: imageName }
+      });
+  
+    } catch (error) {
+      console.error("Error inserting image into database:", error);
+      res.status(500).json({ status: "error", message: "Failed to upload image" });
+    }
+  });
 
 // Route to retrieve all images
 router.get("/get-images", authenticateToken, async (req, res) => {
