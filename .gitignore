@@ -1,0 +1,7 @@
+
+frontend/package/package-lock.json
+middleware/.env
+middleware/package-lock.json
+middleware/node_modules
+# Local Netlify folder
+.netlify

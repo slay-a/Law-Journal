@@ -1,0 +1,85 @@
+# README: How to Run the Frontend
+
+## Steps to Set Up and Run the Frontend Project
+
+### Prerequisites
+- Node.js installed (version 16 or higher recommended)
+- npm installed (comes with Node.js)
+
+### 1. Clone the Repository
+```bash
+git clone <repository-url>
+cd <repository-folder>
+```
+
+### 2. Switch to the `laya_mvc` Branch
+To ensure you're working on the latest codebase, switch to the `laya_mvc` branch:
+```bash
+git checkout laya_mvc
+git pull origin laya_mvc
+```
+
+### 3. Create Your Own Branch
+To avoid making changes to the `laya_mvc` branch, create and switch to your own branch:
+```bash
+git checkout -b <your-branch-name>
+```
+Replace `<your-branch-name>` with your desired branch name (e.g., `feature-xyz`).
+
+### 4. Install Dependencies
+Navigate to the frontend directory (if not already in the root of the project) and install the required npm packages:
+```bash
+npm install
+npm install axios
+```
+
+### 5. Start the Development Server
+Run the development server:
+```bash
+npm run dev
+```
+
+This will start the frontend on a development server (e.g., `http://localhost:5173`). If you're using a different port, the server will indicate the URL.
+
+### 6. Make Changes in Your Branch
+You can now make any changes to the code in your own branch. Ensure you do **not** make any changes directly to the `laya_mvc` branch.
+
+### 7. Save Your Changes and Commit
+After making your changes, add and commit your work:
+```bash
+git add .
+git commit -m "Your descriptive commit message"
+```
+
+### 8. Push Your Changes to Your Branch
+Push your branch to the repository:
+```bash
+git push origin <your-branch-name>
+```
+
+### 9. Testing Your Code
+Ensure your changes work correctly by thoroughly testing your branch. If required, ask for a code review before merging to other branches.
+
+### 10. Do **Not** Push Directly to `laya_mvc`
+Remember, **do not push directly to the `laya_mvc` branch**. Always create and work in your own branch.
+
+---
+
+### Helpful Git Commands
+- **Switch to a branch**:
+  ```bash
+  git checkout <branch-name>
+  ```
+- **Pull the latest changes in your branch**:
+  ```bash
+  git pull origin <your-branch-name>
+  ```
+- **Fetch and list all branches**:
+  ```bash
+  git fetch --all
+  git branch -a
+  ```
+
+---
+
+If you encounter issues or need help, reach out to the repository owner for clarification. Follow the branching policy strictly to maintain code integrity in the `laya_mvc` branch.
