@@ -20,6 +20,7 @@ const LawJournal = Loadable(lazy(() => import('../views/law-journal/LawJournal')
 const PDFManager = Loadable(lazy(() => import('../views/law-journal/PDFManager')));
 const PreviousEntries = Loadable(lazy(() => import('../views/law-journal/PreviousEntries')));
 const EditEntry= Loadable(lazy(() => import('../views/law-journal/EditEntry')));
+const ProfileView = Loadable(lazy(() => import('../layouts/full/header/ProfileView')));
 
 const Router = [
   {
@@ -34,6 +35,7 @@ const Router = [
       {path:'/previous-entries', exact: true, element: <PreviousEntries/>},
       {path:'/edit-entry/:id', exact: true, element: <EditEntry/>},
       { path: '/pdf-manager', exact: true, element: <PDFManager />},
+      { path: '/profile/view', exact: true, element: <ProfileView/>},
       { path: '/icons', exact: true, element: <Icons /> },
       { path: '/ui/typography', exact: true, element: <TypographyPage /> },
       { path: '/ui/shadow', exact: true, element: <Shadow /> },

@@ -1,63 +1,71 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { pdfjs } from "react-pdf";
-import PdfComp from "./PdfComp";
+import {
+  Typography,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Button,
+  TableContainer,
+  TextField
+} from "@mui/material";
 import APIClient from "../../../APIClient";
 import Cookies from "js-cookie";
- 
+import PdfComp from "./PdfComp";
+import DashboardCard from "../../components/shared/DashboardCard";
+
 const url = import.meta.env.VITE_MIDDLEWARE_URL;
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-
-function PDFManager() {
+const PDFManager = () => {
   const [title, setTitle] = useState("");
-  const [file, setFile] = useState("");
-  const [allImage, setAllImage] = useState(null);
+  const [file, setFile] = useState(null);
+  const [allPDFs, setAllPDFs] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [pdfFile, setPdfFile] = useState(null);
+  const pdfsPerPage = 5;
+
 
   useEffect(() => {
-    getPdf();
+    fetchPDFs();
   }, []);
 
-  const getPdf = async () => {
+  const fetchPDFs = async () => {
     try {
       const jwtToken = Cookies.get("jwt_token");
       const result = await APIClient.get("/lawjournal/get-files", {
         headers: { Authorization: `Bearer ${jwtToken}` },
-        withCredentials: true
+        withCredentials: true,
       });
-      console.log(result.data.data);
-      setAllImage(result.data.data);
+      setAllPDFs(result.data.data);
     } catch (error) {
       console.error("Error fetching PDFs:", error);
     }
   };
 
-  const submitImage = async (e) => {
+  const submitPDF = async (e) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("title", title);
     formData.append("file", file);
-    console.log(title, file);
 
     try {
       const jwtToken = Cookies.get("jwt_token");
-      const result = await APIClient.post(
-        "/lawjournal/upload-files",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${jwtToken}`
-          },
-          withCredentials: true
-        }
-      );
-      console.log(result);
+      const result = await APIClient.post("/lawjournal/upload-files", formData, {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
       if (result.data.status === "ok") {
-        alert("Uploaded Successfully!!!");
-        getPdf();
+        alert("Uploaded Successfully!");
+        fetchPDFs();
       }
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.error("Error uploading PDF:", error);
     }
   };
 
@@ -65,155 +73,111 @@ function PDFManager() {
     setPdfFile(`${url}/lawjournal/files/${pdf}`);
   };
 
+  const totalPages = Math.ceil(allPDFs.length / pdfsPerPage);
+  const currentPDFs = allPDFs.slice(
+    (currentPage - 1) * pdfsPerPage,
+    currentPage * pdfsPerPage
+  );
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   return (
-    <div className="PDFManager">
-      <form className="formStyle" onSubmit={submitImage}>
-        <h4>Upload Pdf</h4>
-        <br />
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Title"
-          required
+    <div>
+      <DashboardCard title="Upload and View PDFs">
+        <Box display="flex" alignItems="center" mb={2}>
+        <TextField
+          label="Enter PDF Title"
+          variant="outlined"
+          size="small"
+          value={title}
           onChange={(e) => setTitle(e.target.value)}
+          style={{ marginRight: '5px',flex: '2' }}
         />
-        <br />
-        <input
-          type="file"
-          className="form-control"
-          accept="application/pdf"
-          required
-          onChange={(e) => setFile(e.target.files[0])}
-        />
-        <br />
-        <button className="btn btn-primary" type="submit">
-          Submit
-        </button>
-      </form>
-      <div className="uploaded">
-        <h4>Uploaded PDF:</h4>
-        <div className="output-div">
-          {allImage == null
-            ? ""
-            : allImage.map((data) => {
-                return (
-                  <div className="inner-div" key={data.id}>
-                    <h6>Title: {data.title}</h6>
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => showPdf(data.pdf)}
+        <Button
+          variant="outlined"
+          component="label"
+          style={{ marginRight: '5px' }}        >
+          Choose File
+          <input
+            type="file"
+            accept="application/pdf"
+            hidden
+            onChange={(e) => setFile(e.target.files[0])}
+          />
+        </Button>
+          <Button variant="contained" color="primary" onClick={submitPDF}>
+            Submit
+          </Button>
+        </Box>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Button
+            variant="outlined"
+            disabled={currentPage === 1}
+            onClick={handlePrevPage}
+          >
+            &lt;
+          </Button>
+          <Typography>
+            Page {currentPage} of {totalPages}
+          </Typography>
+          <Button
+            variant="outlined"
+            disabled={currentPage === totalPages}
+            onClick={handleNextPage}
+          >
+            &gt;
+          </Button>
+        </Box>
+        <TableContainer sx={{ mt: 2 }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  <Typography variant="subtitle2" fontWeight={600}>
+                    Title
+                  </Typography>
+                </TableCell>
+                <TableCell align="right">
+                  <Typography variant="subtitle2" fontWeight={600}>
+                    Actions
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {currentPDFs.map((pdf) => (
+                <TableRow key={pdf.id}>
+                <TableCell><Typography variant="subtitle1">{pdf.title}</Typography></TableCell>
+                <TableCell align="right">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => showPdf(pdf.pdf)}
                     >
-                      Show Pdf
-                    </button>
-                  </div>
-                );
-              })}
-        </div>
-      </div>
-      <PdfComp pdfFile={pdfFile} />
+                      Show PDF
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </DashboardCard>
+      <Box mt={3}>
+        <PdfComp pdfFile={pdfFile} />
+      </Box>
     </div>
   );
-}
+};
 
 export default PDFManager;
-// import { useEffect, useState } from "react";
-// // import axios from "axios";
-// import { pdfjs } from "react-pdf";
-// import PdfComp from "./PdfComp";
-// import APIClient from "../../../APIClient";
-
-// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-
-
-// function PDFManager() {
-//   const [title, setTitle] = useState("");
-//   const [file, setFile] = useState("");
-//   const [allImage, setAllImage] = useState(null);
-//   const [pdfFile, setPdfFile] = useState(null);
-
-//   useEffect(() => {
-//     getPdf();
-//   }, []);
-
-//   const getPdf = async () => {
-//     const result = await APIClient.get("/lawjournal/get-files");
-//     console.log(result.data.data);
-//     setAllImage(result.data.data);
-//   };
-
-//   const submitImage = async (e) => {
-//     e.preventDefault();
-//     const formData = new FormData();
-//     formData.append("title", title);
-//     formData.append("file", file);
-//     console.log(title, file);
-
-//     const result = await APIClient.post(
-//       "/lawjournal/upload-files",
-//       formData,
-//       {
-//         headers: { "Content-Type": "multipart/form-data" },
-//       }
-//     );
-//     console.log(result);
-//     if (result.data.status == "ok") {
-//       alert("Uploaded Successfully!!!");
-//       getPdf();
-//     }
-//   };
-
-//   const showPdf = (pdf) => {
-//     setPdfFile(`http://0.0.0.0:10000/lawjournal/files/${pdf}`);
-//   };
-
-//   return (
-//     <div className="PDFManager">
-//       <form className="formStyle" onSubmit={submitImage}>
-//         <h4>Upload Pdf</h4>
-//         <br />
-//         <input
-//           type="text"
-//           className="form-control"
-//           placeholder="Title"
-//           required
-//           onChange={(e) => setTitle(e.target.value)}
-//         />
-//         <br />
-//         <input
-//           type="file"
-//           className="form-control"
-//           accept="application/pdf"
-//           required
-//           onChange={(e) => setFile(e.target.files[0])}
-//         />
-//         <br />
-//         <button className="btn btn-primary" type="submit">
-//           Submit
-//         </button>
-//       </form>
-//       <div className="uploaded">
-//         <h4>Uploaded PDF:</h4>
-//         <div className="output-div">
-//           {allImage == null
-//             ? ""
-//             : allImage.map((data) => {
-//                 return (
-//                   <div className="inner-div" key={data.id}>
-//                     <h6>Title: {data.title}</h6>
-//                     <button
-//                       className="btn btn-primary"
-//                       onClick={() => showPdf(data.pdf)}
-//                     >
-//                       Show Pdf
-//                     </button>
-//                   </div>
-//                 );
-//               })}
-//         </div>
-//       </div>
-//       <PdfComp pdfFile={pdfFile} />
-//     </div>
-//   );
-// }
-
-// export default PDFManager;

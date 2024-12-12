@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
     // Compare plain text password (for simplicity here, though bcrypt should be used)
     if (password === user.password) {
       const session_id = uuidv4();
-      const token = jwt.sign({ session_id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1h" });
+      const token = jwt.sign({ session_id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
       // Update session_id in the database
       await db("Users").where("user_id", user.user_id).update({ session_id });
@@ -34,7 +34,7 @@ router.post("/", async (req, res) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "Lax",
-        maxAge: 60 * 60 * 1000, // 1 hour
+        maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
       });
 
       return res.status(200).json({
