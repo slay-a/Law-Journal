@@ -18,6 +18,8 @@ const Login = Loadable(lazy(() => import('../views/authentication/Login')));
 const QuizApp = Loadable(lazy(() => import('../views/quiz-app/QuizApp')));
 const LawJournal = Loadable(lazy(() => import('../views/law-journal/LawJournal')));
 const PDFManager = Loadable(lazy(() => import('../views/law-journal/PDFManager')));
+const PreviousEntries = Loadable(lazy(() => import('../views/law-journal/PreviousEntries')));
+const EditEntry= Loadable(lazy(() => import('../views/law-journal/EditEntry')));
 
 const Router = [
   {
@@ -29,6 +31,8 @@ const Router = [
       { path: '/sample-page', exact: true, element: <SamplePage /> },
       { path: '/quiz-app', exact: true, element: <QuizApp />},
       {path:'/law-journal', exact: true, element: <LawJournal/>},
+      {path:'/previous-entries', exact: true, element: <PreviousEntries/>},
+      {path:'/edit-entry/:id', exact: true, element: <EditEntry/>},
       { path: '/pdf-manager', exact: true, element: <PDFManager />},
       { path: '/icons', exact: true, element: <Icons /> },
       { path: '/ui/typography', exact: true, element: <TypographyPage /> },

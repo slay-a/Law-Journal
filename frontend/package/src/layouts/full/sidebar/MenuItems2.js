@@ -46,6 +46,13 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
     },
     {
       id: uniqueId(),
+      title: 'Previous Entries',
+      icon: IconTypography,
+      href: '/previous-entries',
+      external: false,
+    },
+    {
+      id: uniqueId(),
       title: 'PDF Journal',
       icon: PictureAsPdfIcon,
       href: '/pdf-manager',
